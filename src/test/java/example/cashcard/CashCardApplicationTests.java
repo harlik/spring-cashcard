@@ -9,15 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
-
-import org.assertj.core.util.Arrays;
 import org.springframework.test.annotation.DirtiesContext;
 
-import static org.assertj.core.api.ListAssert.*;
+import java.net.URI;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -41,14 +36,14 @@ public class CashCardApplicationTests {
     @Test
     @DirtiesContext
     void shouldCreateANewCashCard() {
-        CashCard newCashCard = new CashCard(null, 250d);
+        CashCard newCashCard = new CashCard(null, 250d, "harlik");
         ResponseEntity<Void> createResponse =
                 restTemplate.postForEntity("/cashcards", newCashCard, Void.class);
 
         assertThat(createResponse.getStatusCode())
                 .isEqualTo(HttpStatus.CREATED);
         URI locationOfNewCashCard = createResponse.getHeaders().getLocation();
-        ResponseEntity <String> response =
+        ResponseEntity<String> response =
                 restTemplate.getForEntity(locationOfNewCashCard, String.class);
 
         assertThat(response.getStatusCode())

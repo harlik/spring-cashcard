@@ -1,18 +1,22 @@
 [
   {
     "id": 123,
-    "amount": 456.78
+    "amount": 456.78,
+    "owner": "harlik"
   },
   {
     "id": 124,
-    "amount": 789.01
+    "amount": 789.01,
+    "owner": "alex"
   },
   {
     "id": 125,
-    "amount": 234.56
+    "amount": 234.56,
+    "owner": "stepan"
   },
   {
     "id": 126,
-    "amount": 987.10
+    "amount": 987.10,
+    "owner": "serge"
   }
 ]
