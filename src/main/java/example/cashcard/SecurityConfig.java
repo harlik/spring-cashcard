@@ -17,10 +17,10 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(
-                        request -> request.requestMatchers("/cashcards/**")
-                                .authenticated()
-                )
+        http
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/cashcards/**")
+                        .hasRole("CARD-OWNER"))
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(Customizer.withDefaults());
         return http.build();
@@ -34,20 +34,16 @@ public class SecurityConfig {
     @Bean
     UserDetailsService testOnlyUsers(PasswordEncoder passwordEncoder) {
         User.UserBuilder users = User.builder();
-        UserDetails sarah = users
+        UserDetails harlik = users
                 .username("harlik")
                 .password(passwordEncoder.encode("abc123"))
-                .roles() // No roles for now
-//                .username("alex")
-//                .password(passwordEncoder.encode("abc123"))
-//                .roles() // No roles for now
-//                .username("stepan")
-//                .password(passwordEncoder.encode("abc123"))
-//                .roles() // No roles for now
-//                .username("serge")
-//                .password(passwordEncoder.encode("abc123"))
-//                .roles() // No roles for now
+                .roles("CARD-OWNER")
                 .build();
-        return new InMemoryUserDetailsManager(sarah);
+        UserDetails galinaOwnsNoCards = users
+                .username("galina")
+                .password(passwordEncoder.encode("456zxcv"))
+                .roles("NON-OWNER")
+                .build();
+        return new InMemoryUserDetailsManager(harlik, galinaOwnsNoCards);
     }
 }

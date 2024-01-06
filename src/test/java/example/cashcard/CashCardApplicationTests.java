@@ -175,4 +175,14 @@ public class CashCardApplicationTests {
         double smallestAmount = documentContext.read("$[3].amount");
         assertThat(smallestAmount).isEqualTo(234.56);
     }
+
+    @Test
+    void shouldReturnForbiddenForNotCardOwner() {
+        String nonCardOwnerUsername = "galina";
+        String nonCardOwnerPassword = "456zxcv";
+        var response = restTemplate
+                .withBasicAuth(nonCardOwnerUsername, nonCardOwnerPassword)
+                .getForEntity("/cashcards/123", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
 }
