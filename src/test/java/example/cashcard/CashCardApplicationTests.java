@@ -100,7 +100,7 @@ public class CashCardApplicationTests {
     }
 
     @Test
-    void shouldReturnAllCashCards() {
+    void shouldReturnAllUsersCashCards() {
         ResponseEntity<String> response =
                 restTemplate
                         .withBasicAuth(username, password)
@@ -109,11 +109,11 @@ public class CashCardApplicationTests {
                 .isEqualTo(HttpStatus.OK);
         var documentContext = JsonPath.parse(response.getBody());
         int numberOfCashCards = documentContext.read("$.length()");
-        assertThat(numberOfCashCards).isEqualTo(4);
+        assertThat(numberOfCashCards).isEqualTo(3);
         JSONArray ids = documentContext.read("$..id");
-        assertThat(ids).containsExactlyInAnyOrder(123, 124, 125, 126);
+        assertThat(ids).containsExactlyInAnyOrder(123, 125, 126);
         JSONArray amounts = documentContext.read("$..amount");
-        assertThat(amounts).containsExactlyInAnyOrder(456.78, 789.01, 234.56, 987.10);
+        assertThat(amounts).containsExactlyInAnyOrder(456.78, 234.56, 987.10);
     }
 
     @Test
@@ -169,20 +169,28 @@ public class CashCardApplicationTests {
                 .isEqualTo(HttpStatus.OK);
         var documentContext = JsonPath.parse(response.getBody());
         JSONArray page = documentContext.read("$.[*]");
-        assertThat(page.size()).isEqualTo(4);
+        assertThat(page.size()).isEqualTo(3);
         double largestAmount = documentContext.read("$[0].amount");
         assertThat(largestAmount).isEqualTo(987.10);
-        double smallestAmount = documentContext.read("$[3].amount");
+        double smallestAmount = documentContext.read("$[2].amount");
         assertThat(smallestAmount).isEqualTo(234.56);
     }
 
     @Test
-    void shouldReturnForbiddenForNotCardOwner() {
+    void shouldReturnForbiddenForUserNotHavingCardOwnerRole() {
         String nonCardOwnerUsername = "galina";
         String nonCardOwnerPassword = "456zxcv";
         var response = restTemplate
                 .withBasicAuth(nonCardOwnerUsername, nonCardOwnerPassword)
                 .getForEntity("/cashcards/123", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void shouldReturnForbiddenForNotCardOwner() {
+        var response = restTemplate
+                .withBasicAuth(username, password)
+                .getForEntity("/cashcards/124", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 }

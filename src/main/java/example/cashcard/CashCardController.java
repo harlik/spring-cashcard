@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/cashcards")
@@ -22,18 +24,20 @@ public class CashCardController {
     }
 
     @GetMapping("/{requestedId}")
-    public ResponseEntity<CashCard> findById(@PathVariable Long requestedId) {
-        var searchResult = cashCardRepository.findById(requestedId);
-        if (searchResult.isEmpty()) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<CashCard> findById(@PathVariable Long requestedId, Principal principal) {
+        Optional<CashCard> cashCardOptional = Optional.ofNullable(cashCardRepository
+                .findByIdAndOwner(requestedId, principal.getName()));
+        if (cashCardOptional.isPresent()) {
+            return ResponseEntity.ok(cashCardOptional.get());
         } else {
-            return ResponseEntity.ok(searchResult.get());
+            return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<CashCard>> findAll(Pageable pageable) {
-        Page<CashCard> page = cashCardRepository.findAll(
+    public ResponseEntity<List<CashCard>> findAll(Pageable pageable, Principal principal) {
+        Page<CashCard> page = cashCardRepository.findByOwner(
+                principal.getName(),
                 PageRequest.of(
                         pageable.getPageNumber(),
                         pageable.getPageSize(),
@@ -44,8 +48,12 @@ public class CashCardController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createCashCard(@RequestBody CashCard newCashCard, UriComponentsBuilder ucb) {
-        CashCard savedCashCard = cashCardRepository.save(newCashCard);
+    public ResponseEntity<Void> createCashCard(@RequestBody CashCard newCashCard,
+                                               UriComponentsBuilder ucb,
+                                               Principal principal) {
+        CashCard savedCashCard = cashCardRepository.save(
+                new CashCard(null, newCashCard.amount(), principal.getName())
+        );
         URI savedCashCardLocation = ucb
                 .path("cashcards/{id}")
                 .buildAndExpand(savedCashCard.id())

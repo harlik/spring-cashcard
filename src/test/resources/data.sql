@@ -1,7 +1,7 @@
 INSERT INTO cash_card(ID, AMOUNT, OWNER)
 VALUES (123, 456.78, 'harlik');
 INSERT INTO cash_card(ID, AMOUNT, OWNER)
-VALUES (124, 789.01, 'harlik');
+VALUES (124, 789.01, 'alex');
 INSERT INTO cash_card(ID, AMOUNT, OWNER)
 VALUES (125, 234.56, 'harlik');
 INSERT INTO cash_card(ID, AMOUNT, OWNER)
