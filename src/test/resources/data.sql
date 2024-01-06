@@ -1,4 +1,8 @@
-INSERT INTO cash_card(ID, AMOUNT, OWNER) VALUES (123, 456.78, 'harlik');
-INSERT INTO cash_card(ID, AMOUNT, OWNER) VALUES (124, 789.01, 'alex');
-INSERT INTO cash_card(ID, AMOUNT, OWNER) VALUES (125, 234.56, 'stepan');
-INSERT INTO cash_card(ID, AMOUNT, OWNER) VALUES (126, 987.10, 'serge');
+INSERT INTO cash_card(ID, AMOUNT, OWNER)
+VALUES (123, 456.78, 'harlik');
+INSERT INTO cash_card(ID, AMOUNT, OWNER)
+VALUES (124, 789.01, 'harlik');
+INSERT INTO cash_card(ID, AMOUNT, OWNER)
+VALUES (125, 234.56, 'harlik');
+INSERT INTO cash_card(ID, AMOUNT, OWNER)
+VALUES (126, 987.10, 'harlik');

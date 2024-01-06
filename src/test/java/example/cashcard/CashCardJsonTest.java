@@ -25,9 +25,9 @@ public class CashCardJsonTest {
     void setUp() {
         cashCards = new CashCard[]{
                 new CashCard(123L, 456.78, "harlik"),
-                new CashCard(124L, 789.01, "alex"),
-                new CashCard(125L, 234.56, "stepan"),
-                new CashCard(126L, 987.10, "serge")
+                new CashCard(124L, 789.01, "harlik"),
+                new CashCard(125L, 234.56, "harlik"),
+                new CashCard(126L, 987.10, "harlik")
         };
     }
 
@@ -43,17 +43,17 @@ public class CashCardJsonTest {
                   {
                     "id": 124,
                     "amount": 789.01,
-                    "owner": "alex"
+                    "owner": "harlik"
                   },
                   {
                     "id": 125,
                     "amount": 234.56,
-                    "owner": "stepan"
+                    "owner": "harlik"
                   },
                   {
                     "id": 126,
                     "amount": 987.10,
-                    "owner": "serge"
+                    "owner": "harlik"
                   }
                 ]
                 """;
@@ -93,7 +93,7 @@ public class CashCardJsonTest {
 
     @Test
     public void CashCardSerializationTest() throws IOException {
-        CashCard cashCard = new CashCard(99L, 123.45, "John Doe");
+        CashCard cashCard = new CashCard(99L, 123.45, "harlik");
         assertThat(json.write(cashCard))
                 .isStrictlyEqualToJson("single.json");
         assertThat(json.write(cashCard))
