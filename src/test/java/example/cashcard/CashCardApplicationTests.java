@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
@@ -60,7 +62,6 @@ public class CashCardApplicationTests {
                 .isEqualTo(250d);
         assertThat((Number) documentContext.read("$.id"))
                 .isNotNull();
-
     }
 
     @Test
@@ -192,5 +193,66 @@ public class CashCardApplicationTests {
                 .withBasicAuth(username, password)
                 .getForEntity("/cashcards/124", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @DirtiesContext
+    void shouldUpdateCardAmount() {
+        var newAmount = 101.11;
+        var cashCardId = 123L;
+        var response = restTemplate
+                .withBasicAuth(username, password)
+                .getForEntity("/cashcards/" + cashCardId, String.class);
+        var documentContext = JsonPath.parse(response.getBody());
+        double oldAmount = documentContext.read("$.amount");
+        assertThat(oldAmount).isNotEqualTo(newAmount);
+        var updatedCashCard = new CashCard(cashCardId, newAmount, username);
+        HttpEntity<CashCard> request = new HttpEntity<>(updatedCashCard);
+        var putResponse = restTemplate
+                .withBasicAuth(username, password)
+                .exchange(
+                        "/cashcards/" + cashCardId,
+                        HttpMethod.PUT,
+                        request,
+                        String.class
+                );
+        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(putResponse.getBody()).isBlank();
+        response = restTemplate
+                .withBasicAuth(username, password)
+                .getForEntity("/cashcards/" + cashCardId, String.class);
+        documentContext = JsonPath.parse(response.getBody());
+        double amount = documentContext.read("$.amount");
+        assertThat(amount).isEqualTo(newAmount);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenUpdatingCardAmountByNotCardOwner() {
+        var updatedCashCard = new CashCard(124L, 11.11, username);
+        HttpEntity<CashCard> request = new HttpEntity<>(updatedCashCard);
+        var putResponse = restTemplate
+                .withBasicAuth(username, password)
+                .exchange(
+                        "/cashcards/124",
+                        HttpMethod.PUT,
+                        request,
+                        String.class
+                );
+        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenUpdatingCardAmountOfNonExistingCard() {
+        var updatedCashCard = new CashCard(1L, 11.11, username);
+        HttpEntity<CashCard> request = new HttpEntity<>(updatedCashCard);
+        var putResponse = restTemplate
+                .withBasicAuth(username, password)
+                .exchange(
+                        "/cashcards/1",
+                        HttpMethod.PUT,
+                        request,
+                        String.class
+                );
+        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 }
